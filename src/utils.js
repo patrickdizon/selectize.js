@@ -22,10 +22,10 @@ var isset = function(object) {
  *   1         -> '1'
  *
  * @param {string} value
- * @returns {string}
+ * @returns {string|null}
  */
 var hash_key = function(value) {
-	if (typeof value === 'undefined' || value === null) return '';
+	if (typeof value === 'undefined' || value === null) return null;
 	if (typeof value === 'boolean') return value ? '1' : '0';
 	return value + '';
 };
@@ -87,25 +87,6 @@ hook.after = function(self, method, fn) {
 		fn.apply(self, arguments);
 		return result;
 	};
-};
-
-/**
- * Builds a hash table out of an array of
- * objects, using the specified `key` within
- * each object.
- *
- * @param {string} key
- * @param {mixed} objects
- */
-var build_hash_table = function(key, objects) {
-	if (!$.isArray(objects)) return objects;
-	var i, n, table = {};
-	for (i = 0, n = objects.length; i < n; i++) {
-		if (objects[i].hasOwnProperty(key)) {
-			table[objects[i][key]] = objects[i];
-		}
-	}
-	return table;
 };
 
 /**
@@ -254,16 +235,20 @@ var measureString = function(str, $parent) {
 		return 0;
 	}
 
-	var $test = $('<test>').css({
-		position: 'absolute',
-		top: -99999,
-		left: -99999,
-		width: 'auto',
-		padding: 0,
-		whiteSpace: 'pre'
-	}).text(str).appendTo('body');
+	if (!Selectize.$testInput) {
+		Selectize.$testInput = $('<span />').css({
+			position: 'absolute',
+			top: -99999,
+			left: -99999,
+			width: 'auto',
+			padding: 0,
+			whiteSpace: 'pre'
+		}).appendTo('body');
+	}
 
-	transferStyles($parent, $test, [
+	Selectize.$testInput.text(str);
+
+	transferStyles($parent, Selectize.$testInput, [
 		'letterSpacing',
 		'fontSize',
 		'fontFamily',
@@ -271,10 +256,7 @@ var measureString = function(str, $parent) {
 		'textTransform'
 	]);
 
-	var width = $test.width();
-	$test.remove();
-
-	return width;
+	return Selectize.$testInput.width();
 };
 
 /**
@@ -302,9 +284,10 @@ var autoGrow = function($input) {
 		if (e.type && e.type.toLowerCase() === 'keydown') {
 			keyCode = e.keyCode;
 			printable = (
-				(keyCode >= 97 && keyCode <= 122) || // a-z
-				(keyCode >= 65 && keyCode <= 90)  || // A-Z
 				(keyCode >= 48 && keyCode <= 57)  || // 0-9
+				(keyCode >= 65 && keyCode <= 90)   || // a-z
+				(keyCode >= 96 && keyCode <= 111)  || // numpad 0-9, numeric operators
+				(keyCode >= 186 && keyCode <= 222) || // semicolon, equal, comma, dash, etc.
 				keyCode === 32 // space
 			);
 
@@ -342,3 +325,25 @@ var autoGrow = function($input) {
 	$input.on('keydown keyup update blur', update);
 	update();
 };
+
+var domToString = function(d) {
+	var tmp = document.createElement('div');
+
+	tmp.appendChild(d.cloneNode(true));
+
+	return tmp.innerHTML;
+};
+
+var logError = function(message, options){
+	if(!options) options = {};
+	var component = "Selectize";
+
+	console.error(component + ": " + message)
+
+	if(options.explanation){
+		// console.group is undefined in <IE11
+		if(console.group) console.group();
+		console.error(options.explanation);
+		if(console.group) console.groupEnd();
+	}
+}

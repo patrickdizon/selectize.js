@@ -23,7 +23,7 @@ complete control.
 ```js
 Selectize.define('plugin_name', function(options) {
 	// options: plugin-specific options
-	// this: selectize instance
+	// this: Selectize instance
 });
 ```
 
@@ -41,13 +41,13 @@ Methods should be extended by [wrapping them](http://coreymaynard.com/blog/exten
 
 ```js
 var self = this;
-this.someMethod = function() {
+this.someMethod = (function() {
 	var original = self.someMethod;
 	return function() {
 		// do your logic
 		return original.apply(this, arguments);
 	};
-});
+})();
 ```
 
 **Important:** If the method you're overriding returns a value, make sure the
@@ -63,7 +63,7 @@ like so:
 Selectize.define('plugin_name', function(options) {
 	var self = this;
 
-	// override the setup method to add an extra "click" handler
+	// override the setup method to add an extra `click`  handler
 	this.setup = (function() {
 		var original = self.setup;
 		return function() {

@@ -12,7 +12,7 @@
 		<link rel="stylesheet" href="css/normalize.css">
 		<link rel="stylesheet" href="css/stylesheet.css">
 		<!--[if IE 8]><script src="js/es5.js"></script><![endif]-->
-		<script src="js/jquery.js"></script>
+		<script src="js/jquery.min.js"></script>
 		<script src="../dist/js/standalone/selectize.js"></script>
 		<script src="js/index.js"></script>
 	</head>
@@ -24,7 +24,7 @@
 				<p>Check out the console for more details about each event.</p>
 				<div class="control-group">
 					<label for="select-state">States:</label>
-					<select id="select-state" name="state[]" class="demo-default" style="width:50%" placeholder="Select a state...">
+					<select id="select-state" multiple name="state[]" class="demo-default" style="width:50%">
 						<option value="">Select a state...</option>
 						<option value="AL">Alabama</option>
 						<option value="AK">Alaska</option>
@@ -98,6 +98,8 @@
 					onOptionRemove  : eventHandler('onOptionRemove'),
 					onDropdownOpen  : eventHandler('onDropdownOpen'),
 					onDropdownClose : eventHandler('onDropdownClose'),
+					onFocus         : eventHandler('onFocus'),
+					onBlur          : eventHandler('onBlur'),
 					onInitialize    : eventHandler('onInitialize'),
 				});
 				</script>
